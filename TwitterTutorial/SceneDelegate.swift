@@ -11,12 +11,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        //Window 초기화
+        guard let scene = scene as? UIWindowScene else { return }
+        window = UIWindow(windowScene: scene)
+        
+        // MARK: Window 구성
+        window?.rootViewController = MainTabController()
+        // 화면에 띄울 Root 뷰 컨트롤러 지정
+        
+        window?.makeKeyAndVisible()
+        // 구성된 창 띄우기
+        // 이것도 미설정시 검은화면
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -49,4 +55,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
 }
-
