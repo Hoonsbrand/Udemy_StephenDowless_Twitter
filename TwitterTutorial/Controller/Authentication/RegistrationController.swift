@@ -104,15 +104,18 @@ class RegistrationController: UIViewController {
             print("DEBUG: Please select a profile image..")
             return
         }
+        
         guard let email = emailTextField.text else { return }
         guard let password = passwordTextField.text else { return }
         guard let fullname = fullnameTextField.text else { return }
-        guard let username = usernameTextField.text else { return }
+        guard let username = usernameTextField.text?.lowercased() else { return }
         
         let credentials = AuthCredentials(email: email, password: password, fullname: fullname,
                                           username: username, profileImage: profileImage)
         
         AuthService.shared.registerUser(credentials: credentials) { error, ref in
+            
+            // [현재 연결된 뷰 화면 얻어오기 : IOS 15 대응]
             let scenes = UIApplication.shared.connectedScenes
             let windowScene = scenes.first as? UIWindowScene
             guard let window = windowScene?.windows.first(where: { $0.isKeyWindow }) else { return }
@@ -175,8 +178,6 @@ extension RegistrationController: UIImagePickerControllerDelegate, UINavigationC
         plusPhotoButton.imageView?.clipsToBounds = true
         plusPhotoButton.layer.borderColor = UIColor.white.cgColor
         plusPhotoButton.layer.borderWidth = 3
-        
-        
         
         plusPhotoButton.setImage(profileImage.withRenderingMode(.alwaysOriginal), for: .normal)
         

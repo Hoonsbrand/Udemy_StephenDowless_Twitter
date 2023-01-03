@@ -47,8 +47,10 @@ class MainTabController: UITabBarController {
     
     // 유저 정보 가져오기
     func fetchUser() {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
         // completion을 사용하여 user에 직접적으로 접근이 가능해진다.
-        UserService.shared.fetchUser { user in
+        UserService.shared.fetchUser(uid: uid) { user in
             self.user = user // user 변수에 할당
         }
     }
@@ -84,7 +86,7 @@ class MainTabController: UITabBarController {
     
     @objc func actionButtonTapped() {
         guard let user = user else { return }
-        let controller = UploadTweetController(user: user)
+        let controller = UploadTweetController(user: user, config: .tweet)
         let nav = UINavigationController(rootViewController: controller)
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true)
@@ -102,13 +104,11 @@ class MainTabController: UITabBarController {
     
     func configureViewControllers() {
         
-        // 탭바의 색이 나타나지 않을 때
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        tabBar.standardAppearance = appearance
-        tabBar.scrollEdgeAppearance = tabBar.standardAppearance
+//        특정 VC를 nav라는 이름으로 불러왔으나, 해당 VC의 user라는 저장 프로퍼티에 접근할 수 없다.
+//        왜냐하면, 현재 선택된 nav라는 이름의 VC는 UINavigationController타입이기 때문에,
+//        as?키워드를 통해 내가 접근할 VC로 형변환 시켜주어야한다.
         
-        let feed = FeedController()
+        let feed = FeedController(collectionViewLayout: UICollectionViewFlowLayout())
         let nav1 = templateNavigationViewController(image: UIImage(named: "home_unselected"), rootViewController: feed)
         
         let explore = ExploreController()
@@ -126,17 +126,10 @@ class MainTabController: UITabBarController {
     func templateNavigationViewController(image: UIImage?, rootViewController: UIViewController) -> UINavigationController {
         let nav = UINavigationController(rootViewController: rootViewController)
         nav.tabBarItem.image = image
-        
-        // 내비게이션바의 색이 나타나지 않을 때
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .white
-        nav.navigationBar.standardAppearance = appearance
-        nav.navigationBar.scrollEdgeAppearance = nav.navigationBar.standardAppearance
+        nav.navigationBar.barTintColor = .white.withAlphaComponent(0.5)
         
         return nav
     }
-
 }
 
 

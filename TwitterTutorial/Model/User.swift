@@ -6,14 +6,20 @@
 //
 
 import Foundation
+import Firebase
 
 // 유저 모델
 struct User {
-    let fullname: String
+    var fullname: String
     let email: String
-    let username: String
+    var username: String
     var profileImageUrl: URL?
     let uid: String
+    var isFollowed: Bool = false
+    var stats: UserRelationStats?
+    var bio: String?
+    
+    var isCurrentUser: Bool { return Auth.auth().currentUser?.uid == uid }
     
     // dictionary를 파라미터로 받음으로써 더 편리하게 초기화가 가능하다.
     init(uid: String, dictionary: [String: AnyObject]) {
@@ -22,6 +28,7 @@ struct User {
         self.fullname = dictionary["fullname"] as? String ?? ""
         self.email = dictionary["email"] as? String ?? ""
         self.username = dictionary["username"] as? String ?? ""
+        self.bio = dictionary["bio"] as? String ?? ""
         
         if let profileImageUrlString = dictionary["profileImageUrl"] as? String {
             guard let url = URL(string: profileImageUrlString) else { return }
@@ -29,3 +36,9 @@ struct User {
         }
     }
 }
+
+struct UserRelationStats {
+    var followers: Int
+    var following: Int
+}
+

@@ -8,7 +8,7 @@
 import UIKit
 import Firebase
 
-// 구조체를 따로 만들어 파라미터로 넘겨주면 코드가 더 간결해진다. (조원들이랑 이외의 장점을 말해보기)
+// 구조체를 따로 만들어 파라미터로 넘겨주면 코드가 더 간결해진다. 
 struct AuthCredentials {
     let email: String
     let password: String
@@ -27,10 +27,9 @@ struct AuthService {
     func registerUser(credentials: AuthCredentials, completion: @escaping (Error?, DatabaseReference) -> Void) {
         let email = credentials.email
         let password = credentials.password
-        let fullname = credentials.password
-        let username = credentials.password
-        
-        // 파일 압축
+        let fullname = credentials.fullname
+        let username = credentials.username
+
         guard let imageData = credentials.profileImage.jpegData(compressionQuality: 0.3) else { return }
         
         // 파일 id 생성

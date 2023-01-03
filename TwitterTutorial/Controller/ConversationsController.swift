@@ -11,11 +11,22 @@ class ConversationsController: UIViewController {
     
     // MARK: - Properties
     
+    var contentModeImage: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleToFill
+        iv.image = #imageLiteral(resourceName: "ex")
+        
+        return iv
+    }()
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
+        
+        self.view.addSubview(contentModeImage)
+        contentModeImage.anchor(top: view.topAnchor, left: view.leftAnchor, bottom: view.bottomAnchor, right: view.rightAnchor)
     }
      
     // MARK: - Helpers
@@ -25,3 +36,5 @@ class ConversationsController: UIViewController {
         navigationItem.title = "Messages"
     }
 }
+
+
