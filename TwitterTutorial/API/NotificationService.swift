@@ -48,11 +48,11 @@ struct NotificationService {
         REF_NOTIFICATIONS.child(user.uid).childByAutoId().updateChildValues(values)
     }
     
-    func fetchNotification(completion: @escaping([Notification]) -> Void) {
+    private func getNotifications(uid: String, completion: @escaping ([Notification]) -> Void) {
         var notifications = [Notification]()
-        guard let uid = Auth.auth().currentUser?.uid else { return }
-        
+
         REF_NOTIFICATIONS.child(uid).observe(.childAdded) { snapshot in
+            print("DEBUG: Did enter completion block..")
             guard let dictionary = snapshot.value as? [String: AnyObject] else { return }
             guard let uid = dictionary["uid"] as? String else { return }
             
@@ -63,6 +63,23 @@ struct NotificationService {
             }
         }
     }
+    
+    func fetchNotification(completion: @escaping([Notification]) -> Void) {
+        let notifications = [Notification]()
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        /// 알림이 있는지 확인
+        REF_NOTIFICATIONS.child(uid).observeSingleEvent(of: .value) { snapshot in
+            // 해당 유저에 대한 알림이 없을 때
+            if !snapshot.exists() {
+                completion(notifications)
+            } else {
+                // 알림이 있을 때
+                self.getNotifications(uid: uid, completion: completion)
+            }
+        }
+    }
 }
+
 
 

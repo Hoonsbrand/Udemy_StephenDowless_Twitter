@@ -43,6 +43,13 @@ class FeedController: UICollectionViewController {
         fetchTweets()
     }
     
+    @objc func handleProfileImageTap() {
+        guard let user = user else { return }
+        
+        let controller = ProfileController(user: user)
+        navigationController?.pushViewController(controller, animated: true)
+    }
+    
     // MARK: - API
     
     func fetchTweets() {
@@ -105,6 +112,10 @@ class FeedController: UICollectionViewController {
         profileImageView.setDimensions(width: 32, height: 32)
         profileImageView.layer.cornerRadius = 32 / 2
         profileImageView.layer.masksToBounds = true
+        profileImageView.isUserInteractionEnabled = true
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleProfileImageTap))
+        profileImageView.addGestureRecognizer(tap)
         
         // 비동기로 이미지를 가져옴
         profileImageView.sd_setImage(with: user.profileImageUrl)

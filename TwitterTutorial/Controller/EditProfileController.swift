@@ -11,6 +11,7 @@ import UIKit
 /// controller를 넘겨주는 이유는 ProfileController 측에서 dismiss를 해줄 예정이기 때문이다.
 protocol EditProfileControllerDelegate: AnyObject {
     func controller(_ controller: EditProfileController, wantsToUpdate user: User)
+    func handleLogout()
 }
 
 class EditProfileController: UITableViewController {
@@ -21,6 +22,7 @@ class EditProfileController: UITableViewController {
     
     // user가 초기화 되고나서 EditProfileController를 생성해야하므로 lazy로 선언!
     private lazy var headerView = EditProfileHeader(user: user)
+    private let footerView = EditProfileFooter()
     private let imagePicker = UIImagePickerController()
     weak var delegate: EditProfileControllerDelegate?
     private var userInfoChanged = false
@@ -125,9 +127,11 @@ class EditProfileController: UITableViewController {
     func configureTableView() {
         tableView.tableHeaderView = headerView
         headerView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 180)
-        tableView.tableFooterView = UIView()
-        
         headerView.delegate = self
+        
+        footerView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 100)
+        tableView.tableFooterView = footerView
+        footerView.delegate = self
         
         tableView.register(EditProfileCell.self, forCellReuseIdentifier: EditProfileCell.reuseIdentifier)
     }
@@ -207,4 +211,22 @@ extension EditProfileController: EditProfileCellDelegate {
     }
 }
 
+// MARK: -  EditProfileFooterDelegate
 
+extension EditProfileController: EditProfileFooterDelegate {
+    /// 로그아웃 버튼
+    func handleLogout() {
+        
+        let alert = UIAlertController(title: nil, message: "Are you sure you want to log out?", preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Log Out", style: .destructive, handler: { _ in
+            self.dismiss(animated: true) {
+                self.delegate?.handleLogout()
+            }
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
+        present(alert, animated: true)
+    }
+}

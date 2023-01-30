@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Firebase
 
 class ProfileController: UICollectionViewController {
     
@@ -36,7 +37,7 @@ class ProfileController: UICollectionViewController {
         self.user = user
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
     }
-     
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -53,11 +54,11 @@ class ProfileController: UICollectionViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        
         navigationController?.navigationBar.barStyle = .black
         navigationController?.navigationBar.isHidden = true
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.barStyle = .default
@@ -147,7 +148,15 @@ extension ProfileController {
 
 extension ProfileController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: view.frame.width, height: 350)
+        
+        var height: CGFloat = 300
+        
+        if user.bio != nil {
+            print("DEBUG: User bio is \(user.bio)")
+            height += 40
+        }
+        
+        return CGSize(width: view.frame.width, height: height)
     }
     // 각 셀의 사이즈 설정
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -181,7 +190,7 @@ extension ProfileController: ProfileHeaderDelegate {
         }
         
         // isFollowed가 로딩중일 때는 아무런 동작도 하지 않는다.
-//        guard let isFollowed = user.isFollowed else { return }
+        //        guard let isFollowed = user.isFollowed else { return }
         
         if user.isFollowed {
             UserService.shared.unfollowUser(uid: user.uid) { err, ref in
@@ -198,7 +207,7 @@ extension ProfileController: ProfileHeaderDelegate {
                 // 팔로우 알림
                 NotificationService.shared.uploadNotification(toUser: self.user, type: .follow)
             }
-        } 
+        }
     }
     
     func handleDismissal() {
@@ -209,6 +218,17 @@ extension ProfileController: ProfileHeaderDelegate {
 // MARK: - EditProfileControllerDelegate
 
 extension ProfileController: EditProfileControllerDelegate {
+    func handleLogout() {
+        do {
+            try Auth.auth().signOut()
+            let nav = UINavigationController(rootViewController: LoginController())
+            nav.modalPresentationStyle = .fullScreen
+            self.present(nav, animated: true)
+        } catch let error {
+            print("DEBUG: Failed to sign out with error \(error.localizedDescription)")
+        }
+    }
+    
     /// 프로필 수정이 끝나면 프로토콜을 통해 ProfileController에 바뀐 User 데이터를 할당해주고 새로고침을 한다!
     func controller(_ controller: EditProfileController, wantsToUpdate user: User) {
         controller.dismiss(animated: true)
